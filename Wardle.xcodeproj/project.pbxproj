@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C903FA4728D5DE9E00050592 /* WordScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C903FA4628D5DE9E00050592 /* WordScoreView.swift */; };
+		C919A52528E30A7A00D4FB3C /* WeightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C919A52428E30A7A00D4FB3C /* WeightView.swift */; };
 		C97E764928BE21BD00638D8C /* WardleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C97E764828BE21BD00638D8C /* WardleApp.swift */; };
 		C97E764B28BE21BD00638D8C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C97E764A28BE21BD00638D8C /* ContentView.swift */; };
 		C97E764D28BE21BF00638D8C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C97E764C28BE21BF00638D8C /* Assets.xcassets */; };
@@ -27,6 +28,7 @@
 
 /* Begin PBXFileReference section */
 		C903FA4628D5DE9E00050592 /* WordScoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordScoreView.swift; sourceTree = "<group>"; };
+		C919A52428E30A7A00D4FB3C /* WeightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightView.swift; sourceTree = "<group>"; };
 		C97E764528BE21BD00638D8C /* Wardle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wardle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C97E764828BE21BD00638D8C /* WardleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WardleApp.swift; sourceTree = "<group>"; };
 		C97E764A28BE21BD00638D8C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				C9E7CD2328D335E40023C55A /* SolutionView.swift */,
 				C9C4FFED28C61066009C549F /* TileView.swift */,
 				C9C4FFF128C61448009C549F /* TileRowView.swift */,
+				C919A52428E30A7A00D4FB3C /* WeightView.swift */,
 				C903FA4628D5DE9E00050592 /* WordScoreView.swift */,
 			);
 			path = Views;
@@ -196,6 +199,7 @@
 				C9A032D628C8AA2F00CDEDD1 /* LetterRow.swift in Sources */,
 				C9C4FFF228C61448009C549F /* TileRowView.swift in Sources */,
 				C97E764B28BE21BD00638D8C /* ContentView.swift in Sources */,
+				C919A52528E30A7A00D4FB3C /* WeightView.swift in Sources */,
 				C9E7CD2628D338520023C55A /* CharWeightView.swift in Sources */,
 				C9E7CD2228D3359C0023C55A /* GameView.swift in Sources */,
 				C9B6268228C4BA3400277600 /* Keyboard.swift in Sources */,

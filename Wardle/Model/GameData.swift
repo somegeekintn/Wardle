@@ -68,8 +68,27 @@ struct Word {
         self.uChars = Set<Character>(chars)
     }
     
-    func matches(absent: Set<Character>, present: Set<Character>) -> Bool {
-        !absent.contains(where: { uChars.contains($0) }) && present.isSubset(of: uChars)
+    func matches(absent: Set<Character>, present: Set<Character>, matchByCol: [Character]) -> Bool {
+        // if there is an intersection between absent and present that indicates a word containing
+        // a match in one or more characters that has been eliminated in all other columns. The words
+        // have been pre-filtered via regex at this point so we'll only need to examine the absent
+        // chars in those columns that have not already been matched.
+        
+        let hasAllPresent   = present.isSubset(of: uChars)
+        var hasNoAbsent     = true
+
+        if hasAllPresent {
+            let collisions = absent.intersection(present)
+
+            if !collisions.isEmpty {
+                hasNoAbsent = !zip(chars, matchByCol).contains { (char, match) in return match == "." ? absent.contains(char) : false }
+            }
+            else {
+                hasNoAbsent = !absent.contains(where: { uChars.contains($0) })
+            }
+        }
+
+        return hasAllPresent && hasNoAbsent
     }
     
     func containsByColumn(colChars: [Set<Character>]) -> Bool {
@@ -80,7 +99,7 @@ struct Word {
 class GameData: ObservableObject {
     @Published var letterRows       : [LetterRow]
     @Published var matchingWords    = [Word]()
-    @Published var posWeights       = [[CharWeight]]()
+    @Published var posWeights       = Array<[CharWeight]>(repeating: [], count: 5)
     @Published var allWeights       = [CharWeight]()
     @Published @MainActor var scores  = [WordScore]()
     
@@ -93,6 +112,7 @@ class GameData: ObservableObject {
     var absentChars         = Set<Character>()
     var presentChars        = Set<Character>()
     var absentByCol         = [Set<Character>](repeating: Set<Character>(), count: 5)
+    var matchByCol          = [Character](repeating: ".", count: 5)
     var regex               = try? NSRegularExpression(pattern: ".....")
     
     static let letters      = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -169,7 +189,7 @@ class GameData: ObservableObject {
         }
         
         for word in regexPass {
-            if word.matches(absent: absentChars, present: presentChars) {
+            if word.matches(absent: absentChars, present: presentChars, matchByCol: matchByCol) {
                 if !word.containsByColumn(colChars: absentByCol) {
                     var matched = [Character]()
                     
@@ -197,10 +217,9 @@ class GameData: ObservableObject {
     }
     
     func gatherPatternInfo() {
-        var colMatch    : [Character] = Array(repeating: ".", count: 5)
-        
         absentChars = .init("")
         presentChars = .init("")
+        matchByCol = [Character](repeating: ".", count: 5)
         
         for letterRow in letterRows {
             guard letterRow.locked else { break }
@@ -218,7 +237,7 @@ class GameData: ObservableObject {
                         
                     case .correct:
                         presentChars.insert(char)
-                        colMatch[idx] = char
+                        matchByCol[idx] = char
                         
                     case .unknown:
                         break
@@ -226,15 +245,7 @@ class GameData: ObservableObject {
             }
         }
         
-        // Special case where we might have a character both present and absent
-        // Not sure this is right.
-        for char in colMatch {
-            if absentChars.contains(char) {
-                absentChars.remove(char)
-            }
-        }
-        
-        regex = try? NSRegularExpression(pattern: colMatch.map({ String($0) }).joined())
+        regex = try? NSRegularExpression(pattern: matchByCol.map({ String($0) }).joined())
     }
     
     func updateScores() {
@@ -243,7 +254,6 @@ class GameData: ObservableObject {
             let testPresent = presentChars
             let testPosFreq = posFreq
             let testAnyFreq = anyFreq
-            let start       = Date()
 
             let newScores = await withTaskGroup(of: WordScore.self, returning: [WordScore].self) { group in
                 var results = [WordScore]()

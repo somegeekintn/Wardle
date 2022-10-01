@@ -12,37 +12,11 @@ struct SolutionView: View {
 
     var body: some View {
         ScrollView {
-            Text("\(gameData.matchingWords.count) of \(gameData.wordList.count) possible matches")
-            
-            HStack(alignment: .top) {
-                VStack {
-                    ForEach(gameData.allWeights) { charWeight in
-                        CharWeightView(charWeight)
-                    }
+            LazyVStack(alignment: .leading) {
+                ForEach(gameData.scores) { score in
+                    WordScoreView(score)
                 }
-                
-                Divider()
-                    .padding(.horizontal, 8)
-                
-                ForEach(0..<5) { idx in
-                    VStack {
-                        ForEach(gameData.posWeights[idx]) { charWeight in
-                            CharWeightView(charWeight)
-                        }
-                    }
-                }
-
-                Divider()
-                    .padding(.horizontal, 12)
-
-                LazyVStack(alignment: .leading) {
-                    ForEach(gameData.scores) { score in
-                        WordScoreView(score)
-                    }
-                }
-
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding()
     }

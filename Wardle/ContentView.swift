@@ -8,13 +8,23 @@
 import SwiftUI
 
 struct ContentView: View {
-
+    @EnvironmentObject var gameData : GameData
+    
     var body: some View {
         HStack(spacing: 0) {
             GameView()
-            Color.gray
-                .frame(maxWidth: 1)
-            SolutionView()
+            Color.gray.frame(maxWidth: 1)
+            VStack(spacing: 0) {
+                Text("\(gameData.matchingWords.count) of \(gameData.wordList.count) possible matches")
+                    .font(.system(size: 16, weight: .semibold))
+                    .padding(.vertical, 8)
+                Color.gray.frame(maxHeight: 1)
+                HStack {
+                    WeightView()
+                    Color.gray.frame(maxWidth: 1)
+                    SolutionView()
+                }
+            }
         }
 //        .padding()
 //        .onAppear {
@@ -43,7 +53,7 @@ struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         ContentView()
-            .frame(width: 800.0)
+            .frame(width: 1200.0)
             .environmentObject(gameData)
     }
 }
