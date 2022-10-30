@@ -113,8 +113,8 @@
 			children = (
 				C9A032D728C8AB3500CDEDD1 /* CheckButton.swift */,
 				C9E7CD2528D338520023C55A /* CharWeightView.swift */,
-				C9B6268128C4BA3400277600 /* Keyboard.swift */,
 				C9E7CD2128D3359C0023C55A /* GameView.swift */,
+				C9B6268128C4BA3400277600 /* Keyboard.swift */,
 				C9E7CD2328D335E40023C55A /* SolutionView.swift */,
 				C9C4FFED28C61066009C549F /* TileView.swift */,
 				C9C4FFF128C61448009C549F /* TileRowView.swift */,

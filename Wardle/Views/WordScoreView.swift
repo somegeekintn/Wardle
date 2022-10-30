@@ -18,12 +18,12 @@ struct WordScoreView: View {
     
     let wordScore           : WordScore
     
-    var formattedPosScore   : String {
-        WordScoreView.scoreFormatter.string(from: NSNumber(value: wordScore.posScore)) ?? "\(wordScore.posScore)"
+    var formattedprobability   : String {
+        WordScoreView.scoreFormatter.string(from: NSNumber(value: wordScore.probability)) ?? "\(wordScore.probability)"
     }
     
-    var formattedFreqScore   : String {
-        WordScoreView.scoreFormatter.string(from: NSNumber(value: wordScore.freqScore)) ?? "\(wordScore.freqScore)"
+    var formattedweighted   : String {
+        WordScoreView.scoreFormatter.string(from: NSNumber(value: wordScore.weighted)) ?? "\(wordScore.weighted)"
     }
     
     init(_ wordScore: WordScore) {
@@ -35,7 +35,7 @@ struct WordScoreView: View {
             Text(wordScore.word)
                 .font(.system(size: 18, weight: .semibold, design: .monospaced))
                 .padding(.trailing, 8)
-            Text("\(wordScore.commonScore) | \(formattedFreqScore) | \(formattedPosScore)")
+            Text("\(wordScore.commonality) | \(formattedweighted) | \(formattedprobability)")
                 .font(.system(size: 14, weight: .light, design: .monospaced))
         }
     }
@@ -44,8 +44,8 @@ struct WordScoreView: View {
 struct WordScoreView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            WordScoreView(WordScore(word: "STARE", posScore: (3 + 1/3), freqScore: 1234, commonScore: 127))
-            WordScoreView(WordScore(word: "SAINT", posScore: 0.001, freqScore: 999, commonScore: 321))
+            WordScoreView(WordScore(word: "STARE", probability: (3 + 1/3), masterProb: 0.5, weighted: 1234, commonality: 127))
+            WordScoreView(WordScore(word: "SAINT", probability: 0.001, masterProb: 0.5, weighted: 999, commonality: 321))
         }
     }
 }

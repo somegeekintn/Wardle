@@ -7,16 +7,6 @@
 
 import SwiftUI
 
-extension String {
-    func containsAll(_ chars: Set<Character>) -> Bool {
-        for ch in chars {
-            guard self.contains(ch) else { return false }
-        }
-
-        return true
-    }
-}
-
 struct CharWeight: Comparable, Identifiable {
     let char    : String
     var weight  : Double
@@ -41,17 +31,14 @@ struct CharWeight: Comparable, Identifiable {
     }
 }
 
-struct WordScore: Comparable, Identifiable {
+struct WordScore: Identifiable {
     let word        : String
-    let posScore    : Double
-    let freqScore   : Double
-    let commonScore : Int
+    let probability : Double
+    let masterProb  : Double
+    let weighted    : Double
+    let commonality : Int
 
     var id      : String { "score_\(word)" }
-    
-    static func < (lhs: WordScore, rhs: WordScore) -> Bool {
-        lhs.commonScore == rhs.commonScore ? lhs.freqScore == rhs.freqScore ? lhs.posScore > rhs.posScore : lhs.freqScore > rhs.freqScore : lhs.commonScore > rhs.commonScore
-    }
 }
 
 struct Word {
@@ -67,33 +54,6 @@ struct Word {
         self.chars = chars
         self.uChars = Set<Character>(chars)
     }
-    
-    func matches(absent: Set<Character>, present: Set<Character>, matchByCol: [Character]) -> Bool {
-        // if there is an intersection between absent and present that indicates a word containing
-        // a match in one or more characters that has been eliminated in all other columns. The words
-        // have been pre-filtered via regex at this point so we'll only need to examine the absent
-        // chars in those columns that have not already been matched.
-        
-        let hasAllPresent   = present.isSubset(of: uChars)
-        var hasNoAbsent     = true
-
-        if hasAllPresent {
-            let collisions = absent.intersection(present)
-
-            if !collisions.isEmpty {
-                hasNoAbsent = !zip(chars, matchByCol).contains { (char, match) in return match == "." ? absent.contains(char) : false }
-            }
-            else {
-                hasNoAbsent = !absent.contains(where: { uChars.contains($0) })
-            }
-        }
-
-        return hasAllPresent && hasNoAbsent
-    }
-    
-    func containsByColumn(colChars: [Set<Character>]) -> Bool {
-        return zip(colChars, chars).contains { absent, colChar in absent.contains(colChar) }
-    }
 }
 
 class GameData: ObservableObject {
@@ -101,18 +61,19 @@ class GameData: ObservableObject {
     @Published var matchingWords    = [Word]()
     @Published var posWeights       = Array<[CharWeight]>(repeating: [], count: 5)
     @Published var allWeights       = [CharWeight]()
-    @Published @MainActor var scores  = [WordScore]()
+    @Published var pattern         = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"  // had thought to display this
+    @Published @MainActor var scores = [WordScore]()
     
     var rowCount            : Int { letterRows.count }
     var activeRowIndex      : Int? { letterRows.firstIndex(where: { !$0.locked }) }
 
     var wordList            = [Word]()
+    var masterPosFreq       = [[Character : Int]](repeating: [:], count: charCount)
     var posFreq             = [[Character : Int]](repeating: [:], count: charCount)
     var anyFreq             = [Character : Int]()
-    var absentChars         = Set<Character>()
     var presentChars        = Set<Character>()
-    var absentByCol         = [Set<Character>](repeating: Set<Character>(), count: 5)
     var matchByCol          = [Character](repeating: ".", count: 5)
+    var heisenChars         = Set<Character>()  // characters that are both matched and present elsewhere
     var regex               = try? NSRegularExpression(pattern: ".....")
     
     static let letters      = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -121,7 +82,6 @@ class GameData: ObservableObject {
     
     init() {
         self.letterRows = (0..<GameData.rowCount).map({ LetterRow(id: "row_\($0)") })
-        self.resetFrequencies()
 
         if let listURL = Bundle.main.url(forResource: "word_list", withExtension: "txt") {
             do {
@@ -134,6 +94,7 @@ class GameData: ObservableObject {
             }
         }
         
+        resetMasterFrequencies()
         evaluate()
     }
     
@@ -165,8 +126,22 @@ class GameData: ObservableObject {
             for ch in GameData.letters {
                 posFreq[idx][ch] = 0
             }
-            
-            absentByCol[idx].removeAll()
+        }
+    }
+    
+    func resetMasterFrequencies() {
+        for idx in 0..<GameData.charCount {
+            for ch in GameData.letters {
+                masterPosFreq[idx][ch] = 0
+            }
+        }
+        
+        for word in wordList {
+            for (pos, ch) in word.word.enumerated() {
+                let cnt = masterPosFreq[pos][ch] ?? 0
+                
+                masterPosFreq[pos][ch] = cnt + 1
+            }
         }
     }
     
@@ -177,34 +152,36 @@ class GameData: ObservableObject {
         resetFrequencies()
         gatherPatternInfo()
         
-        if let regex = regex, regex.pattern != "....." {
-            for word in wordList {
-                if regex.numberOfMatches(in: word.word, range: NSRange(location: 0, length: 5)) > 0 {
-                    regexPass.append(word)
+        if let regex = regex {
+            let range = NSRange(location: 0, length: 5)
+
+            regexPass = wordList.filter { regex.numberOfMatches(in: $0.word, range: range) != 0 }
+        }
+
+        for word in regexPass {
+            if !heisenChars.isEmpty {
+                let unmatched = Set(zip(matchByCol, word.chars).filter({ $0 != $1 }).map({ $1 }))
+                
+                if !heisenChars.isSubset(of: unmatched) {
+                    print("heisenChars: \(heisenChars) not found in \(unmatched)")
+                    continue
                 }
             }
-        }
-        else {
-            regexPass = wordList
-        }
-        
-        for word in regexPass {
-            if word.matches(absent: absentChars, present: presentChars, matchByCol: matchByCol) {
-                if !word.containsByColumn(colChars: absentByCol) {
-                    var matched = [Character]()
+            
+            if presentChars.isSubset(of: word.uChars) {
+                var matched = [Character]()
+                
+                for (pos, ch) in word.word.enumerated() {
+                    let cnt = posFreq[pos][ch] ?? 0
                     
-                    for (pos, ch) in word.word.enumerated() {
-                        let cnt = posFreq[pos][ch] ?? 0
-                        
-                        posFreq[pos][ch] = cnt + 1
-                        if !matched.contains(ch) {
-                            anyFreq[ch] = (anyFreq[ch] ?? 0) + 1
-                            matched.append(ch)
-                        }
+                    posFreq[pos][ch] = cnt + 1
+                    if !matched.contains(ch) {
+                        anyFreq[ch] = (anyFreq[ch] ?? 0) + 1
+                        matched.append(ch)
                     }
-                    
-                    filtered.append(word)
                 }
+                
+                filtered.append(word)
             }
         }
 
@@ -217,44 +194,74 @@ class GameData: ObservableObject {
     }
     
     func gatherPatternInfo() {
-        absentChars = .init("")
+        var colPatterns     = Array(repeating: Self.letters, count: 5)
+        
         presentChars = .init("")
+        heisenChars = .init("")
         matchByCol = [Character](repeating: ".", count: 5)
         
         for letterRow in letterRows {
             guard letterRow.locked else { break }
+            var rowPresent  = Set<Character>()
+            var rowMatched  = Set<Character>()
             
             for (idx, letter) in letterRow.letters.enumerated() {
-                guard let char = letter.value?.first else { break }
+                guard let char  = letter.value?.first else { break }
                 
                 switch letter.state {
                     case .absent:
-                        absentChars.insert(char)
+                        colPatterns = colPatterns.map({ $0.filter({ $0 != char }) })
                         
                     case .present:
                         presentChars.insert(char)
-                        absentByCol[idx].insert(char)
+                        rowPresent.insert(char)
+                        colPatterns[idx] = colPatterns[idx].filter({ $0 != char })
                         
                     case .correct:
                         presentChars.insert(char)
-                        matchByCol[idx] = char
+                        rowMatched.insert(char)
+                        // if this was matched in an earlier guess then subsequent guesses
+                        // containing this but not the heisenChar should not be eliminated
+                        if colPatterns[idx] != String(char) {
+                            heisenChars.remove(char)
+                            matchByCol[idx] = char
+                            colPatterns[idx] = String(char)
+                        }
                         
                     case .unknown:
                         break
                 }
             }
+            
+            // fix items clobbered by absent matches
+            colPatterns = zip(matchByCol, colPatterns).map({ $0 != "." ? String($0) : $1 })
+            
+            // detect heisen characters
+            rowPresent.formIntersection(rowMatched)
+            if !rowPresent.isEmpty {
+                heisenChars.formUnion(rowPresent)
+            }
         }
         
-        regex = try? NSRegularExpression(pattern: matchByCol.map({ String($0) }).joined())
+        pattern = colPatterns.map({ "[\($0)]" }).joined()
+        regex = try? NSRegularExpression(pattern: pattern)
+        
+        if !heisenChars.isEmpty {
+            print("heisenChars: \(heisenChars)")
+        }
+        print("pattern: \(pattern)")
     }
     
+
     func updateScores() {
         Task {
-            let testWords   = matchingWords
-            let testPresent = presentChars
-            let testPosFreq = posFreq
-            let testAnyFreq = anyFreq
-
+            let testWords       = matchingWords
+            let testPresent     = presentChars
+            let testMasterFreq  = masterPosFreq
+            let testPosFreq     = posFreq
+            let testAnyFreq     = anyFreq
+            let allWordCount    = wordList.count
+            
             let newScores = await withTaskGroup(of: WordScore.self, returning: [WordScore].self) { group in
                 var results = [WordScore]()
 
@@ -263,21 +270,26 @@ class GameData: ObservableObject {
                         let guessChars  = guess.uChars.filter({ !testPresent.contains($0) })
                         var common      = 0
                         var used        = [Character]()
-                        var posScore    = Double(1.0)
-                        var freqScore   = Double(1.0)
+                        var probability = Double(1.0)
+                        var masterProb  = Double(1.0)
+                        var weighted    = Double(1.0)
                         
                         for (pos, ch) in guess.word.enumerated() {
+                            if let count = testMasterFreq[pos][ch] {
+                                masterProb *= (Double(count) / Double(allWordCount))
+                            }
                             if let count = testPosFreq[pos][ch] {
-                                posScore *= (Double(count) / Double(testWords.count))
+                                probability *= (Double(count) / Double(testWords.count))
                             }
 
                             if !used.contains(ch), let count = testAnyFreq[ch] {
-                                freqScore += (Double(count) / Double(testWords.count))
+                                weighted += (Double(count) / Double(testWords.count))
                                 used.append(ch)
                             }
                         }
                         
-                        posScore *= 100 * 100
+                        probability *= 100
+                        masterProb *= 100 * 1000
 
                         for other in testWords {
                             if guess.word != other.word {
@@ -287,7 +299,7 @@ class GameData: ObservableObject {
                             }
                         }
                         
-                        return WordScore(word: guess.word, posScore: posScore, freqScore: freqScore, commonScore: common)
+                        return WordScore(word: guess.word, probability: probability, masterProb: masterProb, weighted: weighted, commonality: common)
                     }
                 }
                 
@@ -298,7 +310,9 @@ class GameData: ObservableObject {
                 return results
             }
 
-            await MainActor.run { scores = newScores.sorted() }
+            // only if these changes are made in separate steps will the UI not flip out
+            await MainActor.run { scores = scores.filter({ oldScore in newScores.contains(where: { $0.word == oldScore.word }) }) }
+            await MainActor.run { scores = newScores }//.sorted() }
         }
     }
 
