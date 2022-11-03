@@ -36,10 +36,10 @@ struct Letter: Identifiable {
         self.id = id
     }
     
-    init(_ value: String, state: Letter.State) {
+    init(_ value: String, state: Letter.State, id: String? = nil) {
         self.value = value
         self.state = state
-        self.id = value
+        self.id = id ?? value
     }
     
     mutating func cycleState() {

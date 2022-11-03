@@ -14,6 +14,7 @@
 		C97E764D28BE21BF00638D8C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C97E764C28BE21BF00638D8C /* Assets.xcassets */; };
 		C97E765028BE21BF00638D8C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C97E764F28BE21BF00638D8C /* Preview Assets.xcassets */; };
 		C97E765828BE21FA00638D8C /* word_list.txt in Resources */ = {isa = PBXBuildFile; fileRef = C97E765728BE21F900638D8C /* word_list.txt */; };
+		C98A66A52911480200C72BC6 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98A66A42911480200C72BC6 /* TestView.swift */; };
 		C9A032D628C8AA2F00CDEDD1 /* LetterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A032D528C8AA2F00CDEDD1 /* LetterRow.swift */; };
 		C9A032D828C8AB3500CDEDD1 /* CheckButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A032D728C8AB3500CDEDD1 /* CheckButton.swift */; };
 		C9B6268228C4BA3400277600 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B6268128C4BA3400277600 /* Keyboard.swift */; };
@@ -24,6 +25,11 @@
 		C9E7CD2428D335E40023C55A /* SolutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9E7CD2328D335E40023C55A /* SolutionView.swift */; };
 		C9E7CD2628D338520023C55A /* CharWeightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9E7CD2528D338520023C55A /* CharWeightView.swift */; };
 		C9EEC9F428CF3BE200F35A81 /* GameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EEC9F328CF3BE200F35A81 /* GameData.swift */; };
+		C9F5F2C629128FA6007214B4 /* CharWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5F2C529128FA6007214B4 /* CharWeight.swift */; };
+		C9F5F2C829128FBB007214B4 /* WordScore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5F2C729128FBB007214B4 /* WordScore.swift */; };
+		C9F5F2CA29128FD1007214B4 /* BitChar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5F2C929128FD1007214B4 /* BitChar.swift */; };
+		C9F5F2CC29128FE9007214B4 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5F2CB29128FE9007214B4 /* Word.swift */; };
+		C9F5F2CE29129037007214B4 /* BigButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5F2CD29129037007214B4 /* BigButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +42,7 @@
 		C97E764F28BE21BF00638D8C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C97E765128BE21BF00638D8C /* Wardle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Wardle.entitlements; sourceTree = "<group>"; };
 		C97E765728BE21F900638D8C /* word_list.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = word_list.txt; sourceTree = "<group>"; };
+		C98A66A42911480200C72BC6 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		C9A032D528C8AA2F00CDEDD1 /* LetterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterRow.swift; sourceTree = "<group>"; };
 		C9A032D728C8AB3500CDEDD1 /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
 		C9B6268128C4BA3400277600 /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
@@ -46,6 +53,11 @@
 		C9E7CD2328D335E40023C55A /* SolutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolutionView.swift; sourceTree = "<group>"; };
 		C9E7CD2528D338520023C55A /* CharWeightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharWeightView.swift; sourceTree = "<group>"; };
 		C9EEC9F328CF3BE200F35A81 /* GameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameData.swift; sourceTree = "<group>"; };
+		C9F5F2C529128FA6007214B4 /* CharWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharWeight.swift; sourceTree = "<group>"; };
+		C9F5F2C729128FBB007214B4 /* WordScore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordScore.swift; sourceTree = "<group>"; };
+		C9F5F2C929128FD1007214B4 /* BitChar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitChar.swift; sourceTree = "<group>"; };
+		C9F5F2CB29128FE9007214B4 /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
+		C9F5F2CD29129037007214B4 /* BigButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,8 +114,12 @@
 			isa = PBXGroup;
 			children = (
 				C9EEC9F328CF3BE200F35A81 /* GameData.swift */,
+				C9F5F2C929128FD1007214B4 /* BitChar.swift */,
+				C9F5F2C529128FA6007214B4 /* CharWeight.swift */,
 				C9C4FFF328C616E7009C549F /* Letter.swift */,
 				C9A032D528C8AA2F00CDEDD1 /* LetterRow.swift */,
+				C9F5F2CB29128FE9007214B4 /* Word.swift */,
+				C9F5F2C729128FBB007214B4 /* WordScore.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -111,11 +127,13 @@
 		C9EEC9F628CF3C2000F35A81 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C9F5F2CD29129037007214B4 /* BigButton.swift */,
 				C9A032D728C8AB3500CDEDD1 /* CheckButton.swift */,
 				C9E7CD2528D338520023C55A /* CharWeightView.swift */,
 				C9E7CD2128D3359C0023C55A /* GameView.swift */,
 				C9B6268128C4BA3400277600 /* Keyboard.swift */,
 				C9E7CD2328D335E40023C55A /* SolutionView.swift */,
+				C98A66A42911480200C72BC6 /* TestView.swift */,
 				C9C4FFED28C61066009C549F /* TileView.swift */,
 				C9C4FFF128C61448009C549F /* TileRowView.swift */,
 				C919A52428E30A7A00D4FB3C /* WeightView.swift */,
@@ -195,12 +213,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C9F5F2C829128FBB007214B4 /* WordScore.swift in Sources */,
 				C9C4FFF428C616E7009C549F /* Letter.swift in Sources */,
+				C9F5F2C629128FA6007214B4 /* CharWeight.swift in Sources */,
 				C9A032D628C8AA2F00CDEDD1 /* LetterRow.swift in Sources */,
 				C9C4FFF228C61448009C549F /* TileRowView.swift in Sources */,
+				C9F5F2CA29128FD1007214B4 /* BitChar.swift in Sources */,
 				C97E764B28BE21BD00638D8C /* ContentView.swift in Sources */,
 				C919A52528E30A7A00D4FB3C /* WeightView.swift in Sources */,
+				C9F5F2CE29129037007214B4 /* BigButton.swift in Sources */,
 				C9E7CD2628D338520023C55A /* CharWeightView.swift in Sources */,
+				C9F5F2CC29128FE9007214B4 /* Word.swift in Sources */,
+				C98A66A52911480200C72BC6 /* TestView.swift in Sources */,
 				C9E7CD2228D3359C0023C55A /* GameView.swift in Sources */,
 				C9B6268228C4BA3400277600 /* Keyboard.swift in Sources */,
 				C9E7CD2428D335E40023C55A /* SolutionView.swift in Sources */,

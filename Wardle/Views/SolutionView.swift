@@ -24,16 +24,16 @@ struct SolutionView: View {
                 Text("\(item.commonality)")
                     .font(.system(size: 14, weight: .light, design: .monospaced))
             }
-            TableColumn("Weight", value: \.weighted) { item in
-                Text("\(item.weighted.formatted(weightStyle))")
-                    .font(.system(size: 14, weight: .light, design: .monospaced))
-            }
             TableColumn("Prob", value: \.probability) { item in
                 Text("\(item.probability.formatted(probStyle))")
                     .font(.system(size: 14, weight: .light, design: .monospaced))
             }
             TableColumn("Master", value: \.masterProb) { item in
                 Text("\(item.masterProb.formatted(probStyle))")
+                    .font(.system(size: 14, weight: .light, design: .monospaced))
+            }
+            TableColumn("Blend", value: \.blend) { item in
+                Text("\(item.blend.formatted(probStyle))")
                     .font(.system(size: 14, weight: .light, design: .monospaced))
             }
         }
