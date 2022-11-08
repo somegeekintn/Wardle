@@ -9,16 +9,18 @@ import SwiftUI
 
 struct GameView: View {
     @EnvironmentObject var gameData : GameData
-    @State var answer   = ""
+    @State var startingWord = ""
+    @State var answer       = ""
     
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             HStack(alignment: .center) {
                 TextField("Answer", text: $answer)
                     .font(.system(size: 16))
-                    .padding(.horizontal)
-                    .frame(maxWidth: 200)
-                Button("Solve") { gameData.solve(answer, strategy: .probability) }
+                    .frame(maxWidth: 128)
+                    .onSubmit(solveForAnswer)
+                
+                Button("Solve", action: solveForAnswer)
                     .buttonStyle(BigButton())
                     .disabled(answer.count != 5)
             }
@@ -31,23 +33,45 @@ struct GameView: View {
             }
             .padding(.bottom)
             
-            Spacer()
             Keyboard()
-            Spacer()
 
             HStack(spacing: 64) {
-                Button("RESET") { gameData.reset() }
-                    .buttonStyle(BigButton())
-                    .padding(.top, 16)
-                Button("TEST") { gameData.toggleTesting() }
-                    .buttonStyle(BigButton())
-                    .padding(.top, 16)
-            }
+                HStack {
+                    TextField("Starting word", text: $startingWord)
+                        .font(.system(size: 16))
+                        .frame(maxWidth: 128)
+                        .onSubmit(updateStartingWord)
+                        
+                    Button("Update", action: updateStartingWord)
+                        .buttonStyle(BigButton())
+                        .disabled(startingWord.count != 5)
+                        
+                    Button("Test") { gameData.toggleTesting() }
+                        .buttonStyle(BigButton())
+                }
                 
+                Button("Reset") { gameData.reset() }
+                    .buttonStyle(BigButton())
+            }
+            .padding(.top)
+
             Spacer()
         }
         .padding()
         .background(Color("background"))
+        .onAppear { startingWord = gameData.startingWord }
+    }
+    
+    func solveForAnswer() {
+        answer = answer.uppercased()
+        gameData.solve(answer, strategy: .blend)
+    }
+    
+    func updateStartingWord() {
+        let adjWord = startingWord.uppercased()
+        
+        gameData.startingWord = adjWord
+        startingWord = adjWord
     }
 }
 
@@ -56,7 +80,6 @@ struct GameView_Previews: PreviewProvider {
     
     static var previews: some View {
         GameView()
-            .previewLayout(.sizeThatFits)
             .environmentObject(gameData)
     }
 }

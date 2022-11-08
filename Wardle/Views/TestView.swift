@@ -17,7 +17,7 @@ struct TestView: View {
         
         VStack(spacing: 32) {
             HStack {
-                Text(GameData.firstGuess)
+                Text(gameData.startingWord)
                     .font(.system(size: 24))
                 Text(total == 0 ? "0.000" : (guessTotal / total).formatted(.number.precision(.fractionLength(3))))
                     .font(.system(size: 24))

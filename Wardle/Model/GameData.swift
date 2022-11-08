@@ -21,6 +21,7 @@ class GameData: ObservableObject {
     @Published var allWeights       = [CharWeight]()
     @Published var pattern          = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"  // had thought to display this
     @Published var solutionFreq     = Array<Int>(repeating: 0, count: 7)
+    @Published var startingWord     = "SLATE"
     @Published @MainActor var scores = [WordScore]()
     
     var rowCount            : Int { letterRows.count }
@@ -39,42 +40,43 @@ class GameData: ObservableObject {
     
     // okay wow: https://auction-upload-files.s3.amazonaws.com/Wordle_Paper_Final.pdf
 
-// BOXER took 7. 258 words: 3.5155 avg
-// FOYER took 7. 800 words: 3.5362 avg
-// HASTE took 7. 957 words: 3.5831 avg
-// HATCH took 7. 959 words: 3.5871 avg
-// HILLY took 7. 979 words: 3.5975 avg
-// HOUND took 7. 996 words: 3.6124 avg
-// JAUNT took 7. 1050 words: 3.6219 avg
-// JOKER took 7. 1059 words: 3.6327 avg
-// MOUND took 7. 1264 words: 3.6234 avg
-// NIGHT took 7. 1303 words: 3.6309 avg
-// RATTY took 7. 1547 words: 3.6419 avg
-// SHAVE took 7. 1715 words: 3.6490 avg
-// WATCH took 7. 2233 words: 3.6090 avg
+    // SLATE / blend = 3.6009 avg (1) commonality x 2.5 minus present
+    // SLATE / blend = 3.6017 avg (0) commonality x 2.0 minus present
+    // SLATE / blend = 3.6052 avg (0) commonality x 2.0 minus present aggressive no-common 13 vs 24 6 guess words yet worse overall
+    // SLATE / blend = 3.6026 avg (0) commonality x 2.4 minus present
+    // SLATE / blend = 3.6065 avg (2) commonality == 0
 
+    // STALE / blend = 3.6410 avg (0) commonality x 2.0 minus present
+
+    // SLATE / blend = 3.6060 avg (1) commonality x 2.5
+    // SLATE / blend = 3.6065 avg (2) commonality x 3
+    // SLATE / blend = 3.6078 avg (2) commonality == 0
+    // SLATE / blend = 3.6078 avg (0) commonality x 2.4
+    // SLATE / blend = 3.6091 avg (0) commonality x 2
+// really blend is not great, see YIELD where more than half would be eliminated
+    // SALET / blend = 3.6130 avg (0) commonality < 1
     // SLATE / blend = 3.6164 avg (13)
     // SALET / blend = 3.6246 avg (14)
-    // SLATE / prob = 3.6346 avg (13)
-    // SALET / prob = 3.6454 avg
-    // SALET / common = 3.6553 avg
-    // SLATE / common = 3.6661 avg
-    // STARE / common = 3.6790 avg (17)
-    // CRANE / prob = 3.6812 avg
-    // IRATE / common = 3.6881 avg
-    // CRANE / common = 3.6894 avg
-    // ROATE / prob = 3.6898 avg
-    // IRATE / prob = 3.7002 avg
-    // STARE / prob = 3.7076 avg
-    // SANER / common = 3.7214 avg
-    // SAINT / prob = 3.7266 avg
-    // ARISE / prob = 3.7425 avg
-    // SANER / prob = 3.7456 avg
-    // ARISE / common = 3.7482 avg
-    // AUDIO / prob = 3.8972 avg
-    // AUDIO / common = 3.9145 avg
+    // ROATE / blend = 3.6700 avg (5) commonality < 1
+    // CRANE / blend = 3.6734 avg (16)
+    // SLANT / blend = 3.6739 avg (13)
+    // IRATE / blend = 3.6760 avg (14)
+    // STARE / blend = 3.6769 avg (14)
+    // ROATE / blend = 3.6786 avg (17)
+    // SHALE / blend = 3.6924 avg (11)
+    // SLICE / blend = 3.6942 avg (13)
+    // SHARE / blend = 3.7136 avg (16)
+    // SUITE / blend = 3.7171 avg (19)
+    // SAINT / blend = 3.7127 avg (20)
+    // SAUTE / blend = 3.7136 avg (20)
+    // SANER / blend = 3.7244 avg (16)
+    // ARISE / blend = 3.7317 avg (20)
+    // SAUCE / blend = 3.7365 avg (18)
+    // ADIEU / blend = 3.8721 avg (27)
+    // AUDIO / blend = 3.8911 avg (28)
+    // FUZZY / blend = 4.2147 avg (28)
+    // AFFIX / blend = 4.2553 avg (40)
 
-    static let firstGuess   = "SALET"
     static let letters      = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     static let charCount    = 5
     static let rowCount     = 6
@@ -115,7 +117,7 @@ class GameData: ObservableObject {
     }
     
     func testStrategy(_ strategy: Strategy) {
-        print("Testing using \(strategy) with: \(Self.firstGuess) as staring word")
+        print("Testing using \(strategy) with: \(startingWord) as staring word")
         
         testTask = Task {
             var wordCount       = 0
@@ -124,6 +126,7 @@ class GameData: ObservableObject {
             var updateTime      = Date()
             
             for word in wordList {
+                guard !Task.isCancelled else { break }
                 let guessCount = await solve(word.word, strategy: strategy).value
                 
                 wordCount += 1
@@ -161,7 +164,7 @@ class GameData: ObservableObject {
                 if let _ = await scoreTask?.value {
                     solution = await MainActor.run {
                         if let guessIndex = activeRowIndex, guessIndex < 6 {
-                            let guess   = guessIndex == 0 ? Self.firstGuess : bestGuess(at: guessIndex, strategy: strategy)
+                            let guess = bestGuess(at: guessIndex, strategy: strategy)
                             
                             if !guess.isEmpty {
                                 let missed  = zip(guess, adjAnswer).filter({ $0 != $1 }).map({ $0.1 })
@@ -215,9 +218,11 @@ class GameData: ObservableObject {
     
     @MainActor
     func bestGuess(at guessCount: Int, strategy: Strategy) -> String {
-        guard guessCount > 0 else { return Self.firstGuess }
+        guard guessCount > 0 else { return startingWord }
         let sortOrder   : [KeyPathComparator<WordScore>]
         let sorted      : [WordScore]
+        var selection   : WordScore?
+        var guess       : String?
         
         switch strategy {
             case .commonality:  sortOrder = [.init(\.commonality, order: .reverse), .init(\.probability, order: .reverse), .init(\.masterProb, order: .reverse)]
@@ -225,8 +230,51 @@ class GameData: ObservableObject {
             case .blend:        sortOrder = [.init(\.blend, order: .reverse), .init(\.probability, order: .reverse), .init(\.commonality, order: .reverse), .init(\.masterProb, order: .reverse)]
         }
         sorted = scores.sorted(using: sortOrder)
+        selection = sorted.first
+        guess = selection?.word
         
-        return sorted.first?.word ?? ""
+        if let commonality = selection?.commonality {
+            let guessesLeft = (6 - guessCount)
+            let makesSense  = sorted.count > guessesLeft// || (sorted.count > 2 && commonality == 0)
+            
+            if sorted.count > Int(Double(commonality) * 2.0) && guessCount < 5 && makesSense {
+print("common: \(commonality) for \(sorted.count)")
+                let unmatchedIdx    = matchByCol.enumerated().compactMap({ item in item.element == "." ? item.offset : nil })
+//                let matched         = matchByCol.enumerated().compactMap({ item in item.element != "." ? item.element : nil })
+                var chars           = Set<Character>()
+                
+                print("\(sorted.count) remain for \(6 - guessCount) guesses")
+
+                for idx in unmatchedIdx {
+                    chars.formUnion(sorted.map({ $0.word[$0.word.index($0.word.startIndex, offsetBy: idx)] }))
+                }
+//                chars.subtract(matched)
+                chars.subtract(presentChars)
+print("find: \(chars)")
+                
+                if chars.count > 12 {
+                    selection = scores.sorted(using: [KeyPathComparator<WordScore>(\.commonality, order: .reverse)]).first
+                    guess = selection?.word
+print("too many, most in common: \(selection?.word ?? "- n/a -")")
+                }
+                else {
+                    if let better = wordList.sorted(by: { lhs, rhs in
+                        let lhs_c = chars.intersection(lhs.unique).count
+                        let rhs_c = chars.intersection(rhs.unique).count
+
+                        return lhs_c > rhs_c
+                    }).first(where: { word in !letterRows.contains(where: { $0.string == word.word }) }) {
+                        let cnt = chars.intersection(better.chars).count
+                        
+                        print("try: \(better.word) [\(cnt)]")
+                        
+                        guess = better.word
+                    }
+                }
+            }
+        }
+
+        return guess ?? ""
     }
     
     func addNextLetter(_ letter: Letter) {

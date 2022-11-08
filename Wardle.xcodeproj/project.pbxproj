@@ -113,9 +113,9 @@
 		C9EEC9F528CF3C1000F35A81 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				C9EEC9F328CF3BE200F35A81 /* GameData.swift */,
 				C9F5F2C929128FD1007214B4 /* BitChar.swift */,
 				C9F5F2C529128FA6007214B4 /* CharWeight.swift */,
+				C9EEC9F328CF3BE200F35A81 /* GameData.swift */,
 				C9C4FFF328C616E7009C549F /* Letter.swift */,
 				C9A032D528C8AA2F00CDEDD1 /* LetterRow.swift */,
 				C9F5F2CB29128FE9007214B4 /* Word.swift */,

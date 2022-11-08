@@ -10,6 +10,7 @@ import Foundation
 struct Word {
     let word        : String
     let chars       : [Character]
+    let unique      : Set<Character>
     let bitChars    : BitChar
     
     init(_ word: String) {
@@ -18,6 +19,7 @@ struct Word {
         
         self.word = uWord
         self.chars = chars
+        self.unique = Set(uWord)
         self.bitChars = BitChar(word: uWord)
     }
 }

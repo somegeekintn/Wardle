@@ -12,6 +12,7 @@ class LetterRow: Identifiable, ObservableObject {
     @Published var locked      : Bool
     
     var id              : String
+    var string          : String? { locked ? letters.map({ $0.value ?? "" }).joined() : nil }
     var firstEmptyIndex : Int? { letters.firstIndex(where: { $0.isEmpty }) }
     var deleteIndex     : Int? { let count = letters.filter({ !$0.isEmpty }).count; return count > 0 ? count - 1 : nil }
     var canLock         : Bool { !letters.contains(where: { $0.isEmpty }) }
